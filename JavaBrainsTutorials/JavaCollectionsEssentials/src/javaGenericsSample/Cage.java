@@ -1,4 +1,4 @@
-package myOwnGenericsClassDemo;
+package javaGenericsSample;
 
 public class Cage<E extends Animal> {
 
