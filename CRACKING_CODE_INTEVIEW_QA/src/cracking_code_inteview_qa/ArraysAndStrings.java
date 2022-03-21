@@ -239,6 +239,8 @@ public class ArraysAndStrings {
 	//Implement a method to perform basic string compression using the counts of repeated characters. For example, the string aabcccccaaa would become a2b1c5a3. if the "Compressed" string would not
 	//become smaller than the original string, your method should return the original string. You can assume the string has only uppercase and lowercase letters(a-z).
 	
+	//Note that: string concatination takes O(n2) time. I think it is because of we need to copy each element every time when adding new character on string. 
+	//So using string builder solves this issue.
 	public String compressedString(String input) {
 		
 		StringBuilder compressedString = new StringBuilder("");
@@ -270,7 +272,203 @@ public class ArraysAndStrings {
 		return compressedString.toString();
 	}
 	
-	//next step see the book solution for this. 
+	public String solutionCompressedString(String input) {
+		
+		StringBuilder compressedString = new StringBuilder();
+		int char_counter = 0;
+		int length = input.length();
+		int compressedLength = 0;
+		
+		for(int i = 0; i < length; i++) {
+			char_counter++;
+			
+			if(i + 1 >= length || input.charAt(i) != input.charAt(i + 1)) {
+				compressedString.append(input.charAt(i)).append(char_counter);
+				compressedLength = compressedLength + 2;
+				char_counter = 0;
+			}
+			
+			if(compressedLength >= length) return input;
+		}
+		
+		return compressedString.toString();
+	}
+	
+	//QUESTION 7: Rotate Matrix
+	//Given an image representation by an N X N matrix, where each pixel in the image is represented by an integer, write a method to rotate the image by 90 degrees. can you do this in place ?
+	
+	public int[][] solutionRotateMatrix(int[][] inputMatrix) throws Exception {
+	    int length = inputMatrix.length;
+	    int columnLength = inputMatrix[0].length;
+	    if(length != columnLength) throw new Exception("matrix is not equal in length");
+	    
+	    for(int layer = 0; layer < length / 2; layer++) {  //we need to iterate 2 times. 
+	    	int first = layer;  // first is incremented by one 0 -> 1.
+	    	int last = length - 1 - layer; // 3 -> 2
+	    	
+	    	for(int i = first; i < last; i++) {  //first you have to swap three times then 1 times.
+	    		
+	    		int offset = i - first;
+	    		int top = inputMatrix[first][i];  //top should be 00 then 01 then 02 -> first Index always = first. and second Index 0 -> 1 -> 2 => i.
+	    		//copy left values to top
+	    		inputMatrix[first][i] = inputMatrix[last - offset][first]; //left values 30 -> 20 -> 10 , second index is first but first index should be decremented => last - offset.
+	    		//copy bottom values to left
+	    		inputMatrix[last - offset][first] = inputMatrix[last][last - offset];
+	    		//copy right values to bottom
+	    		inputMatrix[last][last - offset] = inputMatrix[i][last];
+	    		//copy top values to right
+	    		inputMatrix[i][last] = top;
+	    		
+	    	}
+	    	
+	    }
+	
+	    return inputMatrix;
+	
+	}
+	
+	//QUESTION 8: Zero Matrix
+	// write an algorithm such that if an element in an M X N matrix is 0, its entire row and column are set to 0.
+	//my solution is the same as book solution.
+
+	public int[][] zeroMatrix(int[][] inputMatrix){
+		int rowLength = inputMatrix.length;
+		int columnLength = inputMatrix[0].length;
+		
+		boolean[] columnIndexesToBeZero = new boolean[columnLength];
+		boolean[] rowIndexesToBeZero = new boolean[rowLength];
+		
+		for(int i = 0; i < rowLength; i++) {
+			for(int j = 0; j < columnLength; j++) {
+				if(inputMatrix[i][j] == 0) {
+					columnIndexesToBeZero[j] = true;
+					rowIndexesToBeZero[i] = true;
+				}
+			}
+		}	
+		
+		for(int i = 0; i < columnLength; i++) {
+			if(columnIndexesToBeZero[i]) makeColumnZero(inputMatrix, i, rowLength);
+		}
+		
+		for(int i = 0; i < rowLength; i++) {
+			if(rowIndexesToBeZero[i]) makeRowZero(inputMatrix, i, columnLength);
+		}
+		
+		printArray(inputMatrix, rowLength, columnLength);
+		return inputMatrix;
+	}
+	
+	//Other Solution from the book: 
+		//If you want to save some space you can do the following: 
+		//-> check if first row and first column has any zero. if so at the end you can make entire row/ entire column zero based on the result.
+		//-> then use first row and first column as columnIndexesToBeZero and rowIndexesToBeZero.
+		//-> by doing this previously i took O(N) space but now it will be O(1) space complexity.
+	public int[][] zeroMatrix_betterSpaceComplexity(int[][] inputMatrix){
+		int rowLength = inputMatrix.length;
+		int columnLength = inputMatrix[0].length;
+		
+		boolean firstRowHasZero = false;
+		boolean firstColumnHasZero = false;
+		
+		for(int i = 0; i < columnLength; i++) {
+			if(inputMatrix[0][i] == 0) {
+				firstRowHasZero = true;
+				break;
+			}
+		}
+		
+		for(int i = 0; i < rowLength; i++) {
+			if(inputMatrix[i][0] == 0) {
+				firstColumnHasZero = true;
+				break;
+			}
+		}
+		
+		for(int i = 1; i < rowLength; i++) {
+			for(int j = 1; j < columnLength; j++) {
+				if(inputMatrix[i][j] == 0) {
+					inputMatrix[i][0] = 0;
+					inputMatrix[0][j] = 0;
+				}
+			}
+		}	
+		
+		for(int i = 0; i < columnLength; i++) {
+			if(inputMatrix[0][i] == 0) makeColumnZero(inputMatrix, i, rowLength);
+		}
+		
+		for(int i = 0; i < rowLength; i++) {
+			if(inputMatrix[i][0] == 0) makeRowZero(inputMatrix, i, columnLength);
+		}
+		
+		if(firstRowHasZero) {
+			makeRowZero(inputMatrix, 0, columnLength);
+		}
+		
+		if(firstColumnHasZero) {
+			makeColumnZero(inputMatrix, 0, rowLength);
+		}
+		
+		printArray(inputMatrix, rowLength, columnLength);
+		
+		return inputMatrix;
+	}
+	
+	private void makeColumnZero(int[][] inputMatrix, int coln, int rowSize) {
+		for(int i = 0; i < rowSize; i++) {
+			inputMatrix[i][coln] = 0;
+		}
+	}
+	
+	private void makeRowZero(int[][] inputMatrix, int row, int colnSize) {
+		for(int i = 0; i < colnSize; i++) {
+			inputMatrix[row][i] = 0;
+		}
+	}
+	
+	private void printArray(int[][] inputMatrix, int rowsize, int colnSize) {
+		for(int i = 0; i< rowsize; i++) {
+			for(int j = 0; j < colnSize; j++) {
+				System.out.print(inputMatrix[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
+	
+	
+	//QUESTION 9: String Rotation: 
+	//Assume you have a method isSubstring which checks if one word is a substring of another. Given two strings, s1 and s2, write a code to check if s2 is a rotation of s1 using only one call
+	//to isSubstring (e.g., "waterbottle" is a rotation of "erbottlewat").
+	
+	public boolean isSubstring(String input1, String input2) {
+		if(input1.length() != input2.length()) return false;
+		
+		int length = input1.length();
+		char firstCharacter = input1.charAt(0);
+		
+			for(int i = 0; i < length; i++) {
+				if(input2.charAt(i) == firstCharacter) {
+					if(checkRotation(input1, input2, i)) return true;
+				}
+			}
+		
+		
+		return false;
+	}
+	
+	private boolean checkRotation(String input1, String input2, int input2CharacterMatchIndex) {
+		int length = input1.length();
+		for(int i = 0; i < length; i++) {
+			if(input2CharacterMatchIndex >= length) input2CharacterMatchIndex = 0;
+			if(input2.charAt(input2CharacterMatchIndex) != input1.charAt(i)) return false;
+			input2CharacterMatchIndex++;
+		}
+		
+		return true;
+	}
+	
+	//I will check book solution for this one.
 	
 	
 	
@@ -282,30 +480,6 @@ public class ArraysAndStrings {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 
 }

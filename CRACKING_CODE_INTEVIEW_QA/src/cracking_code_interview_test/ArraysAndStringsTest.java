@@ -1,6 +1,9 @@
 package cracking_code_interview_test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -107,8 +110,111 @@ public class ArraysAndStringsTest {
 		assertEquals("aabbcd", aas.compressedString("aabbcd"));
 		assertEquals("aaaabcd", aas.compressedString("aaaabcd"));
 		assertEquals("a4b4c1d1", aas.compressedString("aaaabbbbcd"));
+		
+		assertEquals("a2b2c3d4", aas.solutionCompressedString("aabbcccdddd"));
+		assertEquals("abcd", aas.solutionCompressedString("abcd"));
+		assertEquals("aabbcd", aas.solutionCompressedString("aabbcd"));
+		assertEquals("aaaabcd", aas.solutionCompressedString("aaaabcd"));
+		assertEquals("a4b4c1d1", aas.solutionCompressedString("aaaabbbbcd"));
+		
+		
 	}
 	
+	@Test
+	public void Question7_rotateMatrix() throws Exception {
+		
+		int[][] inputMatrix = {
+				{ 1, 2 , 3, 4}, 
+				{ 5, 6 , 7, 8},
+				{ 9, 10 , 11, 12},
+				{ 13, 14 , 15, 16}
+				};
+		int[][] expectedInputMatrix = {
+				{ 13, 9 , 5, 1}, 
+				{ 14, 10 , 6, 2},
+				{ 15, 11 , 7, 3},
+				{ 16, 12 , 8, 4}
+				};
+		
+		int[][] inputMatrix2 = {
+				{1,2},
+				{3,4}
+		};
+		
+		int[][] expectedInputMatrix2 = {
+				{3,1},
+				{4,2}
+		};
+		
+		assertArrayEquals(expectedInputMatrix, aas.solutionRotateMatrix(inputMatrix));
+		assertArrayEquals(expectedInputMatrix2, aas.solutionRotateMatrix(inputMatrix2));
+		
+		
+	}
+	
+	@Test
+	public void Question8_zeroMatrix() {
+		int[][] inputMatrix = {
+				{ 1, 2 , 3, 4}, 
+				{ 5, 0 , 7, 8},
+				{ 9, 10 , 11, 12},
+				{ 13, 14 , 0, 16}
+				};
+		//I create inputMatrix1 because zeroMatrix will update the value of inputMatrix and so zeroMatrix_betterSpaceComplexity will be called with the updated inputMatrix => test failed.
+		int[][] inputMatrix1 = {
+				{ 1, 2 , 3, 4}, 
+				{ 5, 0 , 7, 8},
+				{ 9, 10 , 11, 12},
+				{ 13, 14 , 0, 16}
+				};
+		int[][] expectedInputMatrix = {
+				{ 1, 0 , 0, 4}, 
+				{ 0, 0 , 0, 0},
+				{ 9, 0 , 0, 12},
+				{ 0, 0 , 0, 0}
+				};
+		
+		int[][] inputMatrix2 = {
+				{1,0},
+				{3,4}
+		};
+		int[][] inputMatrix21 = {
+				{1,0},
+				{3,4}
+		};
+		
+		int[][] expectedInputMatrix2 = {
+				{0,0},
+				{3,0}
+		};
+		
+		assertArrayEquals(expectedInputMatrix, aas.zeroMatrix(inputMatrix));
+		assertArrayEquals(expectedInputMatrix2, aas.zeroMatrix(inputMatrix2));
+		
+		assertArrayEquals(expectedInputMatrix, aas.zeroMatrix_betterSpaceComplexity(inputMatrix1));
+		assertArrayEquals(expectedInputMatrix2, aas.zeroMatrix_betterSpaceComplexity(inputMatrix21));
+//		
+	}
+	
+	@Test
+	public void Question9_isSubstring() {
+		String input = "waterbottle";
+		String input2 = "erbottlewat";
+		
+		String input3 = "elephant";
+		String input4 = "anteleph";
+		
+		String input7 = "ed";
+		String input8 = "de";
+		
+		String input5 = "elephant";
+		String input6 = "anreleph";
+		
+       assertTrue(aas.isSubstring(input, input2));
+       assertTrue(aas.isSubstring(input3, input4));
+       assertTrue(aas.isSubstring(input7, input8));
+       assertFalse(aas.isSubstring(input5, input6));
+	}
 	
 	
 	
